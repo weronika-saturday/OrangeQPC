@@ -11,29 +11,26 @@ jobs:
   compile-x86_64:
     name: Compile Application (x86_64)
     runs-on: ubuntu-latest
-    container:
-      image: debian:13
     steps:
-    - name: Install Dependencies
-      env:
-        DEBIAN_FRONTEND: noninteractive
-      run: |
-        apt-get update && apt-get install -y \
-          build-essential cmake file git qt6-base-dev qt6-svg-dev libqt6svg6
-
     - name: Checkout Repository
       uses: actions/checkout@v4
 
-    - name: Run Build and Install
+    - name: Compile inside Debian 13 Container
       run: |
-        cmake -B build -DCMAKE_BUILD_TYPE=Release
-        cmake --build build --target install DESTDIR=AppDir
+        # Запускаем контейнер и монтируем текущую папку. Сборка запишется прямо на хост.
+        docker run --rm -v ${{ github.workspace }}:/workspace -w /workspace debian:13 /bin/bash -c "
+          apt-get update && apt-get install -y \
+            build-essential cmake file git qt6-base-dev qt6-svg-dev libqt6svg6 &&
+          cmake -B build -DCMAKE_BUILD_TYPE=Release &&
+          cmake --build build --target install DESTDIR=AppDir
+        "
 
     - name: Upload Raw AppDir Artifact
       uses: actions/upload-artifact@v4
       with:
         name: raw-appdir-x86_64
         path: AppDir/
+        retention-days: 1
 
   compile-arm64:
     name: Compile Application (ARM64)
@@ -59,6 +56,7 @@ jobs:
       with:
         name: raw-appdir-arm64
         path: AppDir/
+        retention-days: 1
 
   # === ЭТАП 2: Упаковка в AppImage на хост-системе Ubuntu ===
   pack-x86_64:
@@ -74,9 +72,8 @@ jobs:
 
     - name: Download and Prepare Pack Tools
       run: |
-        # Используем curl с флагом -L для корректной обработки редиректов GitHub
-        curl -q -L https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage -o linuxdeploy
-        curl -q -L https://github.com -o linuxdeploy-plugin-qt
+        curl -q -L https://github.com -O linuxdeploy
+        curl -q -L https://github.com -O linuxdeploy-plugin-qt
         chmod +x linuxdeploy linuxdeploy-plugin-qt
 
     - name: Package AppImage
