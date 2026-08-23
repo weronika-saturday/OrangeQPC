@@ -14,33 +14,27 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Compile inside Debian 13 Container
+      - name: Build and Package inside Debian 13 Container
         run: |
-          # Запускаем контейнер, компилируем и сразу исправляем права на созданные файлы
-          docker run --rm -v ${{ github.workspace }}:/workspace -w /workspace debian:13 /bin/bash -c "
-            apt-get update && apt-get install -y \
-              build-essential cmake file git qt6-base-dev qt6-svg-dev libqt6svg6 &&
-            cmake -B build -DCMAKE_BUILD_TYPE=Release &&
-            cmake --build build --target install DESTDIR=/workspace/AppDir &&
-            chown -R $(id -u):$(id -g) AppDir build
-          "
-
-      - name: Download and Prepare Pack Tools
-        run: |
-          curl -q -L https://github.com -O linuxdeploy
-          curl -q -L https://github.com -O linuxdeploy-plugin-qt
-          chmod +x linuxdeploy linuxdeploy-plugin-qt
-
-      - name: Package AppImage
-        env:
-          EXTRA_QT_PLUGINS: svg
-          APPIMAGE_EXTRACT_AND_RUN: 1
-        run: |
-          export PATH="$PWD:$PATH"
-          ARCH=x86_64 ./linuxdeploy \
-            --appdir AppDir/usr/local \
-            --plugin qt \
-            --output appimage
+          docker run --rm -v ${{ github.workspace }}:/workspace -w /workspace \
+            -e ARCH=x86_64 \
+            -e EXTRA_QT_PLUGINS=svg \
+            -e APPIMAGE_EXTRACT_AND_RUN=1 \
+            debian:13 /bin/bash -c "
+              set -e
+              apt-get update && apt-get install -y \
+                build-essential cmake file git curl \
+                qt6-base-dev qt6-svg-dev libqt6svg6 &&
+              cmake -B build -DCMAKE_BUILD_TYPE=Release &&
+              cmake --build build --target install DESTDIR=/workspace/AppDir &&
+              curl -L -o /workspace/linuxdeploy https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage &&
+              curl -L -o /workspace/linuxdeploy-plugin-qt https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage &&
+              chmod +x /workspace/linuxdeploy /workspace/linuxdeploy-plugin-qt &&
+              export PATH=/workspace:\$PATH &&
+              cd /workspace &&
+              ./linuxdeploy --appdir AppDir/usr/local --plugin qt --output appimage &&
+              chown -R $(id -u):$(id -g) AppDir build *.AppImage
+            "
 
       - name: Upload Final x86_64 AppImage
         uses: actions/upload-artifact@v4
@@ -58,32 +52,28 @@ jobs:
       - name: Set up QEMU for ARM64
         uses: docker/setup-qemu-action@v3
 
-      - name: Compile inside Debian 13 ARM64 Container
+      - name: Build and Package inside Debian 13 ARM64 Container
         run: |
-          docker run --rm -v ${{ github.workspace }}:/workspace -w /workspace debian:13 /bin/bash -c "
-            apt-get update && apt-get install -y \
-              build-essential cmake file git qt6-base-dev qt6-svg-dev libqt6svg6 &&
-            cmake -B build-arm -DCMAKE_BUILD_TYPE=Release &&
-            cmake --build build-arm --target install DESTDIR=/workspace/AppDir &&
-            chown -R $(id -u):$(id -g) AppDir build-arm
-          "
-
-      - name: Download and Prepare Pack Tools
-        run: |
-          curl -q -L https://github.com -O linuxdeploy
-          curl -q -L https://github.com -O linuxdeploy-plugin-qt
-          chmod +x linuxdeploy linuxdeploy-plugin-qt
-
-      - name: Package AppImage
-        env:
-          EXTRA_QT_PLUGINS: svg
-          APPIMAGE_EXTRACT_AND_RUN: 1
-        run: |
-          export PATH="$PWD:$PATH"
-          ARCH=aarch64 ./linuxdeploy \
-            --appdir AppDir/usr/local \
-            --plugin qt \
-            --output appimage
+          docker run --rm -v ${{ github.workspace }}:/workspace -w /workspace \
+            --platform linux/arm64 \
+            -e ARCH=aarch64 \
+            -e EXTRA_QT_PLUGINS=svg \
+            -e APPIMAGE_EXTRACT_AND_RUN=1 \
+            debian:13 /bin/bash -c "
+              set -e
+              apt-get update && apt-get install -y \
+                build-essential cmake file git curl \
+                qt6-base-dev qt6-svg-dev libqt6svg6 &&
+              cmake -B build-arm -DCMAKE_BUILD_TYPE=Release &&
+              cmake --build build-arm --target install DESTDIR=/workspace/AppDir &&
+              curl -L -o /workspace/linuxdeploy https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-aarch64.AppImage &&
+              curl -L -o /workspace/linuxdeploy-plugin-qt https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-aarch64.AppImage &&
+              chmod +x /workspace/linuxdeploy /workspace/linuxdeploy-plugin-qt &&
+              export PATH=/workspace:\$PATH &&
+              cd /workspace &&
+              ./linuxdeploy --appdir AppDir/usr/local --plugin qt --output appimage &&
+              chown -R $(id -u):$(id -g) AppDir build-arm *.AppImage
+            "
 
       - name: Upload Final ARM64 AppImage
         uses: actions/upload-artifact@v4
