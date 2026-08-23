@@ -23,7 +23,7 @@ jobs:
 
       - name: Configure and Build
         run: |
-          cmake -B build -DCMAKE_BUILD_TYPE=Release
+          cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr
           cmake --build build --target install DESTDIR=${{ github.workspace }}/AppDir
 
       - name: Download linuxdeploy Tools
@@ -39,7 +39,7 @@ jobs:
         run: |
           export PATH="$PWD:$PATH"
           ARCH=x86_64 ./linuxdeploy \
-            --appdir AppDir/usr/local \
+            --appdir AppDir \
             --plugin qt \
             --output appimage
 
@@ -65,7 +65,7 @@ jobs:
 
       - name: Configure and Build
         run: |
-          cmake -B build -DCMAKE_BUILD_TYPE=Release
+          cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr
           cmake --build build --target install DESTDIR=${{ github.workspace }}/AppDir
 
       - name: Download linuxdeploy Tools
@@ -81,7 +81,7 @@ jobs:
         run: |
           export PATH="$PWD:$PATH"
           ARCH=aarch64 ./linuxdeploy \
-            --appdir AppDir/usr/local \
+            --appdir AppDir \
             --plugin qt \
             --output appimage
 
