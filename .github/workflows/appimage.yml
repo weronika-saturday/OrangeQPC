@@ -11,7 +11,7 @@ jobs:
     name: Build AppImage (x86_64) on Debian
     runs-on: ubuntu-latest
     container:
-      image: debian:13 # Последняя тестовая/стабильная версия Debian 13
+      image: debian:13 # Использует Debian 13 (Trixie)
     
     steps:
     - name: Install System and Qt6 Dependencies
@@ -20,7 +20,7 @@ jobs:
       run: |
         apt-get update && apt-get install -y \
           build-essential cmake file git wget curl xorg-dev libgl1-mesa-dev \
-          qt6-base-dev qt6-svg-dev libqt6svg6 plugins-qt6
+          qt6-base-dev qt6-svg-dev libqt6svg6
 
     - name: Checkout Repository
       uses: actions/checkout@v4
@@ -36,7 +36,7 @@ jobs:
         wget -q https://github.com -O linuxdeploy-plugin-qt
         chmod +x linuxdeploy linuxdeploy-plugin-qt
         
-        # Распаковка, так как FUSE заблокирован в Docker-контейнерах
+        # Распаковка, так как FUSE заблокирован внутри Docker
         ./linuxdeploy --appimage-extract && mv squashfs-root linuxdeploy.AppDir
         ./linuxdeploy-plugin-qt --appimage-extract && mv squashfs-root linuxdeploy-plugin-qt.AppDir
 
@@ -73,7 +73,7 @@ jobs:
         docker run --rm -v ${{ github.workspace }}:/workspace -w /workspace debian:13 /bin/bash -c "
           apt-get update && apt-get install -y \
             build-essential cmake file git wget curl xorg-dev libgl1-mesa-dev \
-            qt6-base-dev qt6-svg-dev libqt6svg6 plugins-qt6 &&
+            qt6-base-dev qt6-svg-dev libqt6svg6 &&
           
           cmake -B build-arm -DCMAKE_BUILD_TYPE=Release &&
           cmake --build build-arm --target install DESTDIR=AppDir &&
@@ -83,7 +83,7 @@ jobs:
           chmod +x linuxdeploy linuxdeploy-plugin-qt &&
           
           ./linuxdeploy --appimage-extract && mv squashfs-root linuxdeploy.AppDir &&
-          ./linuxdeploy-plugin-qt --appimage-extract && mv squashfs-root linuxdeploy-plugin-qt-aarch64.AppDir &&
+          ./linuxdeploy-plugin-qt --appimage-extract && mv squashfs-root linuxdeploy-plugin-qt.AppDir &&
           
           export PATH=\"\$PWD/linuxdeploy-plugin-qt.AppDir/usr/bin:\$PATH\" &&
           export QMAKE=/usr/lib/qt6/bin/qmake &&
