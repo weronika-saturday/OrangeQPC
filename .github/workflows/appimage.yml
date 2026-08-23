@@ -7,59 +7,36 @@ on:
     branches: [ "main", "master" ]
 
 jobs:
-  build-x86_64:
-    name: Build AppImage (x86_64) on Debian
+  # === ЭТАП 1: Компиляция бинарников в среде Debian 13 ===
+  compile-x86_64:
+    name: Compile Application (x86_64)
     runs-on: ubuntu-latest
     container:
-      image: debian:13 # Использует Debian 13 (Trixie)
-    
+      image: debian:13
     steps:
-    - name: Install System and Qt6 Dependencies
+    - name: Install Dependencies
       env:
         DEBIAN_FRONTEND: noninteractive
       run: |
         apt-get update && apt-get install -y \
-          build-essential cmake file git wget curl xorg-dev libgl1-mesa-dev \
-          qt6-base-dev qt6-svg-dev libqt6svg6
+          build-essential cmake file git qt6-base-dev qt6-svg-dev libqt6svg6
 
     - name: Checkout Repository
       uses: actions/checkout@v4
 
-    - name: Build Application
+    - name: Run Build and Install
       run: |
         cmake -B build -DCMAKE_BUILD_TYPE=Release
         cmake --build build --target install DESTDIR=AppDir
 
-    - name: Download Build Tools (linuxdeploy)
-      run: |
-        # Скачивание полноценных бинарников со страницы релизов проекта linuxdeploy
-        wget -q https://github.com -O linuxdeploy
-        wget -q https://github.com -O linuxdeploy-plugin-qt
-        chmod +x linuxdeploy linuxdeploy-plugin-qt
-
-    - name: Create AppImage with Qt6
-      env:
-        QMAKE: /usr/lib/qt6/bin/qmake
-        EXTRA_QT_PLUGINS: svg
-        APPIMAGE_EXTRACT_AND_RUN: 1 # Позволяет выполнять AppImage внутри Docker без FUSE
-      run: |
-        # Добавляем плагин в зону видимости
-        export PATH="$PWD:$PATH"
-        
-        # Сборка итогового пакета
-        ARCH=x86_64 ./linuxdeploy \
-          --appdir AppDir/usr/local \
-          --plugin qt \
-          --output appimage
-
-    - name: Upload x86_64 Artifact
+    - name: Upload Raw AppDir Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: OrangeQPC-x86_64-AppImage
-        path: "*.AppImage"
+        name: raw-appdir-x86_64
+        path: AppDir/
 
-  build-arm64:
-    name: Build AppImage (ARM64) via Debian Container
+  compile-arm64:
+    name: Compile Application (ARM64)
     runs-on: ubuntu-latest
     steps:
     - name: Checkout Repository
@@ -68,30 +45,86 @@ jobs:
     - name: Set up QEMU for ARM64
       uses: docker/setup-qemu-action@v3
 
-    - name: Build in Debian 13 ARM64 Container
+    - name: Compile in Debian 13 ARM64 Container
       run: |
         docker run --rm -v ${{ github.workspace }}:/workspace -w /workspace debian:13 /bin/bash -c "
           apt-get update && apt-get install -y \
-            build-essential cmake file git wget curl xorg-dev libgl1-mesa-dev \
-            qt6-base-dev qt6-svg-dev libqt6svg6 &&
-          
+            build-essential cmake file git qt6-base-dev qt6-svg-dev libqt6svg6 &&
           cmake -B build-arm -DCMAKE_BUILD_TYPE=Release &&
-          cmake --build build-arm --target install DESTDIR=AppDir &&
-          
-          # Скачивание правильных ARM64 версий инструментов
-          wget -q https://github.com -O linuxdeploy &&
-          wget -q https://github.com -O linuxdeploy-plugin-qt &&
-          chmod +x linuxdeploy linuxdeploy-plugin-qt &&
-          
-          export PATH=\"\$PWD:\$PATH\" &&
-          export QMAKE=/usr/lib/qt6/bin/qmake &&
-          export EXTRA_QT_PLUGINS=svg &&
-          export APPIMAGE_EXTRACT_AND_RUN=1 &&
-          
-          ARCH=aarch64 ./linuxdeploy --appdir AppDir/usr/local --plugin qt --output appimage
+          cmake --build build-arm --target install DESTDIR=AppDir
         "
 
-    - name: Upload ARM64 Artifact
+    - name: Upload Raw AppDir ARM64 Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: raw-appdir-arm64
+        path: AppDir/
+
+  # === ЭТАП 2: Упаковка в AppImage на хост-системе Ubuntu ===
+  pack-x86_64:
+    name: Pack AppImage (x86_64)
+    needs: compile-x86_64
+    runs-on: ubuntu-latest
+    steps:
+    - name: Download Compiled AppDir
+      uses: actions/download-artifact@v4
+      with:
+        name: raw-appdir-x86_64
+        path: AppDir
+
+    - name: Download and Prepare Pack Tools
+      run: |
+        # Используем curl с флагом -L для корректной обработки редиректов GitHub
+        curl -q -L https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage -o linuxdeploy
+        curl -q -L https://github.com -o linuxdeploy-plugin-qt
+        chmod +x linuxdeploy linuxdeploy-plugin-qt
+
+    - name: Package AppImage
+      env:
+        EXTRA_QT_PLUGINS: svg
+        APPIMAGE_EXTRACT_AND_RUN: 1
+      run: |
+        export PATH="$PWD:$PATH"
+        ARCH=x86_64 ./linuxdeploy \
+          --appdir AppDir/usr/local \
+          --plugin qt \
+          --output appimage
+
+    - name: Upload Final x86_64 AppImage
+      uses: actions/upload-artifact@v4
+      with:
+        name: OrangeQPC-x86_64-AppImage
+        path: "*.AppImage"
+
+  pack-arm64:
+    name: Pack AppImage (ARM64)
+    needs: compile-arm64
+    runs-on: ubuntu-latest
+    steps:
+    - name: Download Compiled AppDir
+      uses: actions/download-artifact@v4
+      with:
+        name: raw-appdir-arm64
+        path: AppDir
+
+    - name: Download and Prepare Pack Tools
+      run: |
+        curl -q -L https://github.com -O linuxdeploy
+        curl -q -L https://github.com -O linuxdeploy-plugin-qt
+        chmod +x linuxdeploy linuxdeploy-plugin-qt
+
+    - name: Package AppImage
+      env:
+        EXTRA_QT_PLUGINS: svg
+        APPIMAGE_EXTRACT_AND_RUN: 1
+      run: |
+        export PATH="$PWD:$PATH"
+        ARCH=aarch64 ./linuxdeploy \
+          --appdir AppDir/usr/local \
+          --plugin qt \
+          --output appimage
+
+    - name: Upload Final ARM64 AppImage
       uses: actions/upload-artifact@v4
       with:
         name: OrangeQPC-ARM64-AppImage
