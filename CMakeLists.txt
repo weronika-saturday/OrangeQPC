@@ -69,6 +69,13 @@ install(TARGETS OrangeQPC
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
 
+install(FILES ${CMAKE_SOURCE_DIR}/assets/orangeqpc.desktop
+  DESTINATION ${CMAKE_INSTALL_DATADIR}/applications
+)
+install(FILES ${CMAKE_SOURCE_DIR}/assets/orangeqpc.svg
+  DESTINATION ${CMAKE_INSTALL_DATADIR}/icons/hicolor/scalable/apps
+)
+
 if(QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(OrangeQPC)
 endif()
