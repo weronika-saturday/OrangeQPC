@@ -29,3 +29,13 @@ I don’t want a Macbook. Modern Macs don’t support 70-90 modern games: online
 Modern Mac don’t support other software.
 
 Maybe there is a GUI for Qemu for Apple Silicon Mac.
+
+## Donate
+
+Available [YooMoney](https://yoomoney.ru/to/4100116203822715).
+
+Bitcoin (minimum 0.00003 BTC): 
+```
+bc1q2ep0f54yfymk636aqm5c5rgvcxc7q93jf4qfu4
+```
+
