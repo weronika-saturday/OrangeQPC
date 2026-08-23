@@ -1,0 +1,99 @@
+name: Build Debian 13 Qt6 AppImage (x86_64 & ARM64)
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  build-x86_64:
+    name: Build AppImage (x86_64) on Debian
+    runs-on: ubuntu-latest
+    container:
+      image: debian:13 # Последняя тестовая/стабильная версия Debian 13
+    
+    steps:
+    - name: Install System and Qt6 Dependencies
+      env:
+        DEBIAN_FRONTEND: noninteractive
+      run: |
+        apt-get update && apt-get install -y \
+          build-essential cmake file git wget curl xorg-dev libgl1-mesa-dev \
+          qt6-base-dev qt6-svg-dev libqt6svg6 plugins-qt6
+
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Build Application
+      run: |
+        cmake -B build -DCMAKE_BUILD_TYPE=Release
+        cmake --build build --target install DESTDIR=AppDir
+
+    - name: Download Build Tools (linuxdeploy)
+      run: |
+        wget -q https://github.com -O linuxdeploy
+        wget -q https://github.com -O linuxdeploy-plugin-qt
+        chmod +x linuxdeploy linuxdeploy-plugin-qt
+        
+        # Распаковка, так как FUSE заблокирован в Docker-контейнерах
+        ./linuxdeploy --appimage-extract && mv squashfs-root linuxdeploy.AppDir
+        ./linuxdeploy-plugin-qt --appimage-extract && mv squashfs-root linuxdeploy-plugin-qt.AppDir
+
+    - name: Create AppImage with Qt6
+      env:
+        QMAKE: /usr/lib/qt6/bin/qmake
+        EXTRA_QT_PLUGINS: svg
+      run: |
+        export PATH="$PWD/linuxdeploy-plugin-qt.AppDir/usr/bin:$PATH"
+        
+        ARCH=x86_64 ./linuxdeploy.AppDir/AppRun \
+          --appdir AppDir/usr/local \
+          --plugin qt \
+          --output appimage
+
+    - name: Upload x86_64 Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: OrangeQPC-x86_64-AppImage
+        path: "*.AppImage"
+
+  build-arm64:
+    name: Build AppImage (ARM64) via Debian Container
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
+    - name: Set up QEMU for ARM64
+      uses: docker/setup-qemu-action@v3
+
+    - name: Build in Debian 13 ARM64 Container
+      run: |
+        docker run --rm -v ${{ github.workspace }}:/workspace -w /workspace debian:13 /bin/bash -c "
+          apt-get update && apt-get install -y \
+            build-essential cmake file git wget curl xorg-dev libgl1-mesa-dev \
+            qt6-base-dev qt6-svg-dev libqt6svg6 plugins-qt6 &&
+          
+          cmake -B build-arm -DCMAKE_BUILD_TYPE=Release &&
+          cmake --build build-arm --target install DESTDIR=AppDir &&
+          
+          wget -q https://github.com -O linuxdeploy &&
+          wget -q https://github.com -O linuxdeploy-plugin-qt &&
+          chmod +x linuxdeploy linuxdeploy-plugin-qt &&
+          
+          ./linuxdeploy --appimage-extract && mv squashfs-root linuxdeploy.AppDir &&
+          ./linuxdeploy-plugin-qt --appimage-extract && mv squashfs-root linuxdeploy-plugin-qt-aarch64.AppDir &&
+          
+          export PATH=\"\$PWD/linuxdeploy-plugin-qt.AppDir/usr/bin:\$PATH\" &&
+          export QMAKE=/usr/lib/qt6/bin/qmake &&
+          export EXTRA_QT_PLUGINS=svg &&
+          
+          ARCH=aarch64 ./linuxdeploy.AppDir/AppRun --appdir AppDir/usr/local --plugin qt --output appimage
+        "
+
+    - name: Upload ARM64 Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: OrangeQPC-ARM64-AppImage
+        path: "*.AppImage"
