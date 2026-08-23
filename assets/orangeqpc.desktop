@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=OrangeQPC
+Comment=User-friendly GUI for running Classic MacOS on Qemu
+Exec=OrangeQPC
+Icon=orangeqpc
+Categories=Utility;Emulator;
+Terminal=false
