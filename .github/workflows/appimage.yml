@@ -32,22 +32,22 @@ jobs:
 
     - name: Download Build Tools (linuxdeploy)
       run: |
+        # Скачивание полноценных бинарников со страницы релизов проекта linuxdeploy
         wget -q https://github.com -O linuxdeploy
         wget -q https://github.com -O linuxdeploy-plugin-qt
         chmod +x linuxdeploy linuxdeploy-plugin-qt
-        
-        # Распаковка, так как FUSE заблокирован внутри Docker
-        ./linuxdeploy --appimage-extract && mv squashfs-root linuxdeploy.AppDir
-        ./linuxdeploy-plugin-qt --appimage-extract && mv squashfs-root linuxdeploy-plugin-qt.AppDir
 
     - name: Create AppImage with Qt6
       env:
         QMAKE: /usr/lib/qt6/bin/qmake
         EXTRA_QT_PLUGINS: svg
+        APPIMAGE_EXTRACT_AND_RUN: 1 # Позволяет выполнять AppImage внутри Docker без FUSE
       run: |
-        export PATH="$PWD/linuxdeploy-plugin-qt.AppDir/usr/bin:$PATH"
+        # Добавляем плагин в зону видимости
+        export PATH="$PWD:$PATH"
         
-        ARCH=x86_64 ./linuxdeploy.AppDir/AppRun \
+        # Сборка итогового пакета
+        ARCH=x86_64 ./linuxdeploy \
           --appdir AppDir/usr/local \
           --plugin qt \
           --output appimage
@@ -78,18 +78,17 @@ jobs:
           cmake -B build-arm -DCMAKE_BUILD_TYPE=Release &&
           cmake --build build-arm --target install DESTDIR=AppDir &&
           
+          # Скачивание правильных ARM64 версий инструментов
           wget -q https://github.com -O linuxdeploy &&
           wget -q https://github.com -O linuxdeploy-plugin-qt &&
           chmod +x linuxdeploy linuxdeploy-plugin-qt &&
           
-          ./linuxdeploy --appimage-extract && mv squashfs-root linuxdeploy.AppDir &&
-          ./linuxdeploy-plugin-qt --appimage-extract && mv squashfs-root linuxdeploy-plugin-qt.AppDir &&
-          
-          export PATH=\"\$PWD/linuxdeploy-plugin-qt.AppDir/usr/bin:\$PATH\" &&
+          export PATH=\"\$PWD:\$PATH\" &&
           export QMAKE=/usr/lib/qt6/bin/qmake &&
           export EXTRA_QT_PLUGINS=svg &&
+          export APPIMAGE_EXTRACT_AND_RUN=1 &&
           
-          ARCH=aarch64 ./linuxdeploy.AppDir/AppRun --appdir AppDir/usr/local --plugin qt --output appimage
+          ARCH=aarch64 ./linuxdeploy --appdir AppDir/usr/local --plugin qt --output appimage
         "
 
     - name: Upload ARM64 Artifact
