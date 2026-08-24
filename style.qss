@@ -5,6 +5,33 @@ QLineEdit { background-color: #FFFFFF; border: 2px solid #E0E0E0; border-radius:
 QLineEdit:focus { border: 2px solid #FF5E3A; }
 QPushButton { background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #FF9F43, stop:1 #FF3366); color: white; border: none; border-radius: 8px; padding: 8px 16px; font-weight: bold; }
 QPushButton:hover { background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #FFAA55, stop:1 #FF4577); }
-QRadioButton { spacing: 8px; color: #4A4A4A; }
-QRadioButton::indicator { width: 16px; height: 16px; border-radius: 8px; border: 2px solid #D3D3D3; background: white; }
-QRadioButton::indicator:checked { border-color: #FF3366; background: #FF3366; }
+/* Базовое состояние переключателя и его текста */
+QRadioButton {
+    color: #444444;
+    padding-left: 0px;
+}
+
+/* Кастомизация графического кружка (индикатора) */
+QRadioButton::indicator {
+    width: 16px;
+    height: 16px;
+    border-radius: 9px;         /* Создает идеальный круг (половина от ширины + рамка) */
+    border: 2px solid #D1D1D1;
+    background-color: #FFFFFF;
+    
+    /* ЖЕСТКИЙ ФИКС ДЛЯ APPIMAGE И QT6: */
+    /* Так как в StyleSheet-режиме Qt6 игнорирует стандартное свойство spacing, */
+    /* мы физически расталкиваем текст вправо внешним отступом самого кружка. */
+    margin-right: 10px;         
+}
+
+/* Состояние переключателя, когда он выбран */
+QRadioButton::indicator:checked {
+    border-color: #FFA455;     /* Оранжевый контур в стиле OrangeQPC */
+    background-color: #FF5E0E;   /* Плотный оранжевый центр */
+}
+
+/* Эффект при наведении курсора для отзывчивости интерфейса */
+QRadioButton::indicator:hover {
+    border-color: #FF5E0E;
+}
