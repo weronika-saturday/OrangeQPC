@@ -34,7 +34,7 @@ jobs:
 
       - name: Package AppImage
         env:
-          EXTRA_QT_PLUGINS: svg
+          EXTRA_QT_PLUGINS: svg,platformthemes,styles
           APPIMAGE_EXTRACT_AND_RUN: 1
         run: |
           export PATH="$PWD:$PATH"
@@ -76,7 +76,7 @@ jobs:
 
       - name: Package AppImage
         env:
-          EXTRA_QT_PLUGINS: svg
+          EXTRA_QT_PLUGINS: svg,platformthemes,styles
           APPIMAGE_EXTRACT_AND_RUN: 1
         run: |
           export PATH="$PWD:$PATH"
