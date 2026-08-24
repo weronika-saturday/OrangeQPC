@@ -18,6 +18,7 @@ I’m sure there is a GUI for Qemu for Windows. Qemu installation on Windows and
 ## MacOS 8?
 
 MacOS 8 does not work well in Qemu. Only MacOS 8.0 and MacOS 8.1 run in **qemu-m68k**. OrangeQPC for PowerPC versions of MacOS. 
+If you want to run MacOS 8 in the emulator - use emulators like [Basilisk](https://basilisk.cebix.net/) and [Mini vMac](https://www.gryphel.com/c/minivmac/).
 
 ## MacBook (Apple Silicon) support is planned?
 
