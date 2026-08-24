@@ -5,6 +5,29 @@ QLineEdit { background-color: #FFFFFF; border: 2px solid #E0E0E0; border-radius:
 QLineEdit:focus { border: 2px solid #FF5E3A; }
 QPushButton { background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #FF9F43, stop:1 #FF3366); color: white; border: none; border-radius: 8px; padding: 8px 16px; font-weight: bold; }
 QPushButton:hover { background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #FFAA55, stop:1 #FF4577); }
-QRadioButton { spacing: 8px; color: #4A4A4A; }
-QRadioButton::indicator { width: 16px; height: 16px; border-radius: 8px; border: 2px solid #D3D3D3; background: white; }
-QRadioButton::indicator:checked { border-color: #FF3366; background: #FF3366; }
+QRadioButton {
+    color: #444444;
+    /* ГАРАНТИРОВАННЫЙ ФИКС: Сдвигаем текстовый контейнер вправо на 28 пикселей. 
+       Это железно освободит 28px слева под кружок и зазор, текст физически не сможет наехать. */
+    padding-left: 28px; 
+}
+
+QRadioButton::indicator {
+    width: 16px;
+    height: 16px;
+    border-radius: 9px;
+    border: 2px solid #D1D1D1;
+    background-color: #FFFFFF;
+    /* Позиционируем сам кружок в крайнюю левую точку созданного нами паддинга */
+    position: absolute;
+    left: 0px;
+}
+
+QRadioButton::indicator:checked {
+    border-color: #FFA455;
+    background-color: #FF5E0E; /* Исправлен Hex-код */
+}
+
+QRadioButton::indicator:hover {
+    border-color: #FF5E0E;
+}
