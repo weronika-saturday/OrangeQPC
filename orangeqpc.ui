@@ -295,7 +295,144 @@
          </property>
         </widget>
        </item>
-       <item>
+		       <item>
+        <layout class="QGridLayout" name="macVersionsGrid">
+         <!-- Фиксируем горизонтальный зазор между колонками сетки -->
+         <property name="horizontalSpacing">
+          <number>20</number>
+         </property>
+         <item row="0" column="0">
+          <widget class="QRadioButton" name="MacOS9RadioButton">
+           <property name="minimumSize">
+            <size>
+             <width>115</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>MacOS 9</string>
+           </property>
+           <attribute name="buttonGroup">
+            <string notr="true">buttonGroup_2</string>
+           </attribute>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QRadioButton" name="MacOS10PublicBetaRadioButton">
+           <!-- Расширенная минимальная ширина под длинный текст -->
+           <property name="minimumSize">
+            <size>
+             <width>160</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>MacOS 10 Public Beta</string>
+           </property>
+           <attribute name="buttonGroup">
+            <string notr="true">buttonGroup_2</string>
+           </attribute>
+          </widget>
+         </item>
+         <item row="0" column="2">
+          <widget class="QRadioButton" name="MacOS100RadioButton">
+           <property name="minimumSize">
+            <size>
+             <width>115</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>MacOS 10.0</string>
+           </property>
+           <attribute name="buttonGroup">
+            <string notr="true">buttonGroup_2</string>
+           </attribute>
+          </widget>
+         </item>
+         <item row="0" column="3">
+          <widget class="QRadioButton" name="MacOS101RadioButton">
+           <property name="minimumSize">
+            <size>
+             <width>115</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>MacOS 10.1</string>
+           </property>
+           <attribute name="buttonGroup">
+            <string notr="true">buttonGroup_2</string>
+           </attribute>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QRadioButton" name="MacOS102RadioButton">
+           <property name="minimumSize">
+            <size>
+             <width>115</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>MacOS 10.2</string>
+           </property>
+           <attribute name="buttonGroup">
+            <string notr="true">buttonGroup_2</string>
+           </attribute>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QRadioButton" name="MacOS103RadioButton">
+           <property name="minimumSize">
+            <size>
+             <width>115</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>MacOS 10.3</string>
+           </property>
+           <attribute name="buttonGroup">
+            <string notr="true">buttonGroup_2</string>
+           </attribute>
+          </widget>
+         </item>
+         <item row="1" column="2">
+          <widget class="QRadioButton" name="MacOS104RadioButton">
+           <property name="minimumSize">
+            <size>
+             <width>115</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>MacOS 10.4</string>
+           </property>
+           <attribute name="buttonGroup">
+            <string notr="true">buttonGroup_2</string>
+           </attribute>
+          </widget>
+         </item>
+         <item row="1" column="3">
+          <widget class="QRadioButton" name="MacOS105RadioButton">
+           <property name="minimumSize">
+            <size>
+             <width>115</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>MacOS 10.5</string>
+           </property>
+           <attribute name="buttonGroup">
+            <string notr="true">buttonGroup_2</string>
+           </attribute>
+          </widget>
+         </item>
+        </layout>
+       </item>
+
         <layout class="QGridLayout" name="macVersionsGrid">
          <item row="0" column="0">
           <widget class="QRadioButton" name="MacOS9RadioButton">
