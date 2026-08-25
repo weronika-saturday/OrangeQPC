@@ -81,12 +81,16 @@ OrangeQPC::OrangeQPC(QWidget *parent)
         "QRadioButton { spacing: 8px; color: #4A4A4A; }"
 
         // Неактивное состояние радиокнопки (серый пустой круг)
-        "QRadioButton::indicator { "
+        "QRadioButton::indicator { "    
+        "   width: 20px; "  
+        "   height: 20px; "
         "   image: url(:/assets/radio_unchecked.svg); "
         "}"
 
         // Активное состояние: точный градиентный круг с белой точкой по центру
         "QRadioButton::indicator:checked { "
+        "   width: 20px; "  
+        "   height: 20px; "    
         "   image: url(:/assets/radio_checked.svg); "
         "}"
 
