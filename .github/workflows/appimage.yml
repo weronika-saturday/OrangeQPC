@@ -50,7 +50,9 @@ jobs:
       - name: Rename artifact
         run: |
           for f in OrangeQPC*.AppImage; do
-            [ "$f" != "OrangeQPC-x86_64.AppImage" ] && mv "$f" OrangeQPC-x86_64.AppImage
+            if [ "$f" != "OrangeQPC-x86_64.AppImage" ]; then
+              mv "$f" OrangeQPC-x86_64.AppImage
+            fi
           done
 
       - name: Upload Final x86_64 AppImage
@@ -98,7 +100,9 @@ jobs:
       - name: Rename artifact
         run: |
           for f in OrangeQPC*.AppImage; do
-            [ "$f" != "OrangeQPC-arm64.AppImage" ] && mv "$f" OrangeQPC-arm64.AppImage
+            if [ "$f" != "OrangeQPC-arm64.AppImage" ]; then
+              mv "$f" OrangeQPC-arm64.AppImage
+            fi
           done
 
       - name: Upload Final ARM64 AppImage
