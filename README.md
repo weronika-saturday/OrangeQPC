@@ -4,12 +4,14 @@
 
 <hr />
 
-OrangeQPC is an open-source user-friendly GUI for running Classic MacOS (from MacOS 9 to Mac OS X 10.5 Leopard) on [Qemu](https://www.qemu.org/) for Linux, SteamDeck, SteamMachine, Raspberry Pi and chromeOS.
+OrangeQPC (Orange Qemu PowerPC) is an open-source user-friendly GUI for running Classic MacOS (from MacOS 9 to Mac OS X 10.5 Leopard) on [Qemu](https://www.qemu.org/) for Linux, SteamDeck, SteamMachine, Raspberry Pi and chromeOS.
 Created on [Qt6](https://www.qt.io/) with beautiful UI.
 
 First comfortable GUI for Qemu created by girl. 
 
+<p align="center">
 <img src="https://github.com/weronika-saturday/OrangeQPC/blob/main/preview/preview.png" alt="OrangeQPC Preview">
+</p>
 
 ## Why does not support Windows?
 
@@ -26,14 +28,14 @@ Not. I don’t have Apple Computers (all iterations). I don’t know how Qemu wo
 
 I made a beautiful orange UI. This UI is incompatible (maybe) with macOS UI.
 
-I don’t want a Macbook. Modern Macs don’t support 70-90 modern games: online/multiplayer games (anti-cheats), CS2 and other Source/Source 2 games (Workshop Tools and other modding software). 
+I don’t want a Macbook. Modern Macs don’t support 70-90% modern games: online/multiplayer games (anti-cheats), CS2 and other Source/Source 2 games (Workshop Tools and other modding software). 
 Modern Mac don’t support other software.
 
 Maybe there is a GUI for Qemu for Apple Silicon Mac.
 
 ## Donate
 
-Available [YooMoney](https://yoomoney.ru/to/4100116203822715).
+Available [YooMoney](https://yoomoney.ru/to/4100116203822715) and [DonatePay](https://new.donatepay.ru/@Weronika_Saturday).
 
 Bitcoin (minimum 0.00003 BTC): 
 ```
