@@ -6,6 +6,8 @@
 #include <QMessageBox>
 #include <QString>
 #include <QIcon>
+#include <QRadioButton>
+#include <QList>
 
 OrangeQPC::OrangeQPC(QWidget *parent)
     : QMainWindow(parent)
@@ -78,7 +80,7 @@ OrangeQPC::OrangeQPC(QWidget *parent)
         "QPushButton#BrowseButton:hover, QPushButton#BrowseDVDButton:hover, QPushButton#BrowseQemuButton:hover { background: #FFF0F2; }"
 
         // Текст радиокнопок
-        "QRadioButton { spacing: 8px; color: #4A4A4A; }"
+        "QRadioButton { spacing: 8px; color: #4A4A4A; min-height: 24px; }"
 
         // Неактивное состояние радиокнопки (серый пустой круг)
         "QRadioButton::indicator { "    
@@ -102,6 +104,25 @@ OrangeQPC::OrangeQPC(QWidget *parent)
     ui->WithoutDVDRadioButton->setChecked(true);
     ui->DVDLineEdit->setEnabled(false);
     ui->BrowseDVDButton->setEnabled(false);
+
+    // Гарантируем каждой строке грида версий MacOS достаточную высоту,
+    // чтобы Qt никогда не сжимал индикатор радиокнопки (20x20 в QSS)
+    // в узкий прямоугольник при авто-расчёте layout'а. Без этого на
+    // некоторых стилях/DPI строки сетки могут получить меньше места,
+    // чем нужно индикатору, и картинка рисуется искажённой.
+    for (int row = 0; row < ui->macVersionsGrid->rowCount(); ++row) {
+        ui->macVersionsGrid->setRowMinimumHeight(row, 30);
+    }
+    const QList<QRadioButton *> macVersionRadios = {
+        ui->MacOS9RadioButton, ui->MacOS10PublicBetaRadioButton,
+        ui->MacOS100RadioButton, ui->MacOS101RadioButton,
+        ui->MacOS102RadioButton, ui->MacOS103RadioButton,
+        ui->MacOS104RadioButton, ui->MacOS105RadioButton
+    };
+    for (QRadioButton *radio : macVersionRadios) {
+        radio->setMinimumHeight(30);
+    }
+    
 }
 
 OrangeQPC::~OrangeQPC()
