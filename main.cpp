@@ -10,7 +10,7 @@ int main(int argc, char *argv[])
 
 
     // Загрузка стилей в стиле референса
-    QFile styleFile("style.qss");
+    QFile styleFile(":/style.qss");
     if (styleFile.open(QFile::ReadOnly)) {
         QString styleSheet = QLatin1String(styleFile.readAll());
         a.setStyleSheet(styleSheet);
